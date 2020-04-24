@@ -1,2 +1,0 @@
-C:\Users\yagoc\Documents\GitHub\BuildingEscape-Game\BuildingEscape\Intermediate\Build\Win64\UE4Editor\Development\BuildingEscape\Definitions.BuildingEscape.h
-C:\Users\yagoc\Documents\GitHub\BuildingEscape-Game\BuildingEscape\Source\BuildingEscape\BuildingEscape.h
