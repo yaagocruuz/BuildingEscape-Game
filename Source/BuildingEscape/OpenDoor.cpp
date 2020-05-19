@@ -15,7 +15,6 @@ UOpenDoor::UOpenDoor()
 	// ...
 }
 
-
 // Called when the game starts
 void UOpenDoor::BeginPlay()
 {
@@ -28,10 +27,10 @@ void UOpenDoor::BeginPlay()
 	// Set initial yaw to apply the Lerp to all doors
 	InitialYaw = GetOwner()->GetActorRotation().Yaw;
 	CurrentYaw = InitialYaw;
-	OpenAngle += InitialYaw;
+	TargetYaw += InitialYaw;
 	
 	UE_LOG(LogTemp, Warning, TEXT("%s"), *GetOwner()->GetActorRotation().ToString());
-	UE_LOG(LogTemp, Warning, TEXT("%f"), InitialYaw + OpenAngle);
+	UE_LOG(LogTemp, Warning, TEXT("%f"), InitialYaw + TargetYaw);
 
 	// Using FRotator
 	// FRotator OpenDoor = GetOwner()->GetActorRotation();
@@ -53,18 +52,23 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 
 	if (PressurePlate && PressurePlate->IsOverlappingActor(ActorThatOpens))
 	{
+		// if you leave the pressure plate it will stop from opening wherever it where.
+		// Need to make a while loop to make sure the door gets to the desired angle.
 		OpenDoor(DeltaTime);
+		DoorLastOpened = GetWorld()->GetTimeSeconds();
 	}
 	else
 	{
-		CloseDoor(DeltaTime);
+		if (GetWorld()->GetTimeSeconds() - DoorLastOpened > DoorCloseDelay)
+		{
+			CloseDoor(DeltaTime);
+		}
 	}
-	
 }
 
 void UOpenDoor::OpenDoor(float DeltaTime) 
 {
-	CurrentYaw = FMath::Lerp(CurrentYaw, OpenAngle, DeltaTime * 0.5f);
+	CurrentYaw = FMath::Lerp(CurrentYaw, TargetYaw, DeltaTime * DoorOpenSpeed);
 	FRotator DoorRotation = GetOwner()->GetActorRotation();
 	DoorRotation.Yaw = CurrentYaw;
 	GetOwner()->SetActorRotation(DoorRotation);
@@ -72,7 +76,7 @@ void UOpenDoor::OpenDoor(float DeltaTime)
 
 void UOpenDoor::CloseDoor(float DeltaTime)
 {
-	CurrentYaw = FMath::Lerp(CurrentYaw, InitialYaw, DeltaTime * 1.f);
+	CurrentYaw = FMath::Lerp(CurrentYaw, InitialYaw, DeltaTime * DoorCloseSpeed);
 	FRotator DoorRotation = GetOwner()->GetActorRotation();
 	DoorRotation.Yaw = CurrentYaw;
 	GetOwner()->SetActorRotation(DoorRotation);
