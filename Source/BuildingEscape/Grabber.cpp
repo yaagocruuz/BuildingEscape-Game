@@ -1,7 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
+#include "DrawDebugHelpers.h"
+#include "Engine/World.h"
+#include "GameFramework/PlayerController.h"
+#include "Math/Vector.h"
 #include "Grabber.h"
+
+#define OUT
 
 // Sets default values for this component's properties
 UGrabber::UGrabber()
@@ -28,7 +33,29 @@ void UGrabber::BeginPlay()
 void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	
+	// Get players viewpoint
+	FVector PlayerViewLocation;
+	FRotator PlayerViewRotation;
+	
+	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
+		OUT PlayerViewLocation, 
+		OUT PlayerViewRotation
+	);
+	
+	// Player's reach distance
+	FVector LineTraceEnd = PlayerViewLocation + (PlayerViewRotation.Vector() * Reach);
+	
+	DrawDebugLine(
+		GetWorld(),
+		PlayerViewLocation,
+		LineTraceEnd,
+		FColor(0, 255, 0),
+		false,
+		0.f,
+		0,
+		5.f
+	);
 
-	// ...
 }
 
