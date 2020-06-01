@@ -25,9 +25,32 @@ void UGrabber::BeginPlay()
 	Super::BeginPlay();
 
 	UE_LOG(LogTemp, Warning, TEXT("Grabber reporting for duty!"));
-	
+
+	// Check for the Physics Handle Component
+	PhysicsHandle = GetOwner()->FindComponentByClass<UPhysicsHandleComponent>();
+	if (!PhysicsHandle)
+	{
+		UE_LOG(LogTemp, Error, TEXT("NO Physics Handle Component found on: %s!!"), *GetOwner()->GetName());
+	}
+
+	InputComponent = GetOwner()->FindComponentByClass<UInputComponent>();
+	if (InputComponent)
+	{
+		InputComponent->BindAction("Grab", IE_Pressed, this, &UGrabber::Grab);
+		InputComponent->BindAction("Grab", IE_Released, this, &UGrabber::Release);
+	}
+
 }
 
+void UGrabber::Grab()
+{
+	UE_LOG(LogTemp, Error, TEXT("Grab key pressed!"));
+}
+
+void UGrabber::Release()
+{
+	UE_LOG(LogTemp, Error, TEXT("Grab key released!"));
+}
 
 // Called every frame
 void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -46,6 +69,7 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 	// Player's reach distance
 	FVector LineTraceEnd = PlayerViewLocation + (PlayerViewRotation.Vector() * Reach);
 	
+	// Draw line to show player's reach
 	DrawDebugLine(
 		GetWorld(),
 		PlayerViewLocation,
@@ -57,5 +81,25 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 		5.f
 	);
 
+	FHitResult Hit;
+
+	// Ray-cast out to a certain distance (reach)
+	FCollisionQueryParams TraceParams(FName(TEXT("")), false, GetOwner());
+	
+	GetWorld()->LineTraceSingleByObjectType(
+		OUT Hit,
+		PlayerViewLocation,
+		LineTraceEnd,
+		FCollisionObjectQueryParams(ECollisionChannel::ECC_PhysicsBody),
+		TraceParams
+	);
+
+	//See what it hits
+	AActor* ActorHit = Hit.GetActor();
+	// Logging out to test
+	if (ActorHit)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Line trace has hit the object: %s"), *ActorHit->GetName());
+	}
 }
 
