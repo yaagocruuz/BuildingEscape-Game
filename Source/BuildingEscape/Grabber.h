@@ -37,5 +37,5 @@ private:
 	void SetInputComponent();
 
 	// Return the first Actor within reach with physics body
-	FHitResult GetFirstPhysicsBodyInReach(); const
+	FHitResult GetFirstPhysicsBodyInReach() const;
 };

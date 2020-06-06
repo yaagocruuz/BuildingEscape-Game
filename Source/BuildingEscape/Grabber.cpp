@@ -1,10 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+#include "Grabber.h"
 #include "DrawDebugHelpers.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
-#include "Math/Vector.h"
-#include "Grabber.h"
 
 #define OUT
 
@@ -51,16 +50,39 @@ void UGrabber::Grab()
 {
 	UE_LOG(LogTemp, Error, TEXT("Grab key pressed!"));
 
-	GetFirstPhysicsBodyInReach();
-	// Only raycast when key is pressed and see if we reach any actors with a physics body collision channel set
-	// If we hit something, then attach physics handle.
-	// TODO: attach physics handle
+	FHitResult HitResult = GetFirstPhysicsBodyInReach();
+
+	if (HitResult.GetActor())
+	{
+		// Get players viewpoint
+		FVector PlayerViewLocation;
+		FRotator PlayerViewRotation;
+
+		GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
+			OUT PlayerViewLocation,
+			OUT PlayerViewRotation
+		);
+
+		// Player's reach distance
+		FVector LineTraceEnd = PlayerViewLocation + (PlayerViewRotation.Vector() * Reach);
+
+		UPrimitiveComponent* ComponentToGrab = HitResult.GetComponent();
+
+		PhysicsHandle->GrabComponentAtLocation(
+			ComponentToGrab,
+			NAME_None,
+			LineTraceEnd
+		);
+	}
 }
 
 void UGrabber::Release()
 {
 	UE_LOG(LogTemp, Error, TEXT("Grab key released!"));
-	// TODO remove/release the physics handle
+	if (PhysicsHandle->GetGrabbedComponent())
+	{
+		PhysicsHandle->ReleaseComponent();
+	}
 }
 
 // Called every frame
@@ -68,8 +90,22 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// If the Physics handle is attached
-		//Move the object
+	if (PhysicsHandle->GetGrabbedComponent())
+	{
+		// Get players viewpoint
+		FVector PlayerViewLocation;
+		FRotator PlayerViewRotation;
+
+		GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
+			OUT PlayerViewLocation,
+			OUT PlayerViewRotation
+		);
+
+		// Player's reach distance
+		FVector LineTraceEnd = PlayerViewLocation + (PlayerViewRotation.Vector() * Reach);
+
+		PhysicsHandle->SetTargetLocation(LineTraceEnd);
+	}
 }
 
 FHitResult UGrabber::GetFirstPhysicsBodyInReach() const
