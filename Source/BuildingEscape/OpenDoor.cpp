@@ -28,7 +28,7 @@ void UOpenDoor::BeginPlay()
 	InitialYaw = GetOwner()->GetActorRotation().Yaw;
 	CurrentYaw = InitialYaw;
 	TargetYaw += InitialYaw;
-	
+
 	UE_LOG(LogTemp, Warning, TEXT("%s"), *GetOwner()->GetActorRotation().ToString());
 	UE_LOG(LogTemp, Warning, TEXT("%f"), InitialYaw + TargetYaw);
 
@@ -41,7 +41,7 @@ void UOpenDoor::BeginPlay()
 	{
 		UE_LOG(LogTemp, Error, TEXT("%s has the open door component on it, but no PressurePlate set!"), *GetOwner()->GetName());
 	}
-	
+
 }
 
 
@@ -66,7 +66,7 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	}
 }
 
-void UOpenDoor::OpenDoor(float DeltaTime) 
+void UOpenDoor::OpenDoor(float DeltaTime)
 {
 	CurrentYaw = FMath::Lerp(CurrentYaw, TargetYaw, DeltaTime * DoorOpenSpeed);
 	FRotator DoorRotation = GetOwner()->GetActorRotation();
