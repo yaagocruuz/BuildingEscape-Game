@@ -7,6 +7,11 @@
 #include "PhysicsEngine/PhysicsHandleComponent.h"
 #include "Grabber.generated.h"
 
+struct PlayerViewPoint
+{
+	FVector Location;
+	FRotator Rotation;
+};
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class BUILDINGESCAPE_API UGrabber : public UActorComponent
@@ -38,4 +43,10 @@ private:
 
 	// Return the first Actor within reach with physics body
 	FHitResult GetFirstPhysicsBodyInReach() const;
+
+	// Return the Line Trace End
+	FVector GetPlayerReach() const;
+
+	// Get Player View Point
+	PlayerViewPoint GetPlayerViewPoint() const;
 };
