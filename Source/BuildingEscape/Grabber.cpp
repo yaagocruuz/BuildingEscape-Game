@@ -79,10 +79,7 @@ void UGrabber::Grab()
 void UGrabber::Release()
 {
 	UE_LOG(LogTemp, Error, TEXT("Grab key released!"));
-	if (PhysicsHandle->GetGrabbedComponent())
-	{
-		PhysicsHandle->ReleaseComponent();
-	}
+	PhysicsHandle->ReleaseComponent();
 }
 
 // Called every frame
