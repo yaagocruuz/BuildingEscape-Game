@@ -22,14 +22,17 @@ void UGrabber::BeginPlay()
 
 	UE_LOG(LogTemp, Warning, TEXT("Grabber reporting for duty!"));
 
-	FindPhysicsHandle();
-	SetInputComponent();
+	if (FindPhysicsHandle())
+	{
+		SetInputComponent();
+	}
 }
 
+// Set Input commands
 void UGrabber::SetInputComponent()
 {
 	InputComponent = GetOwner()->FindComponentByClass<UInputComponent>();
-	if (InputComponent)
+	if (InputComponent && PhysicsHandle)
 	{
 		InputComponent->BindAction("Grab", IE_Pressed, this, &UGrabber::Grab);
 		InputComponent->BindAction("Grab", IE_Released, this, &UGrabber::Release);
@@ -37,13 +40,16 @@ void UGrabber::SetInputComponent()
 }
 
 // Check for the Physics Handle Component
-void UGrabber::FindPhysicsHandle()
+bool UGrabber::FindPhysicsHandle()
 {
 	PhysicsHandle = GetOwner()->FindComponentByClass<UPhysicsHandleComponent>();
-	if (PhysicsHandle == nullptr)
+	if (!PhysicsHandle)
 	{
 		UE_LOG(LogTemp, Error, TEXT("NO Physics Handle Component found on: %s!!"), *GetOwner()->GetName());
+		return false;
 	}
+
+	return true;
 }
 
 void UGrabber::Grab()
@@ -72,7 +78,8 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (PhysicsHandle->GetGrabbedComponent())
+	if (!PhysicsHandle) { return; }
+	else if (PhysicsHandle->GetGrabbedComponent())
 	{
 		// Move the object the player is holding
 		PhysicsHandle->SetTargetLocation(GetPlayerReach());

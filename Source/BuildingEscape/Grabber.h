@@ -38,7 +38,7 @@ private:
 
 	void Grab();
 	void Release();
-	void FindPhysicsHandle();
+	bool FindPhysicsHandle();
 	void SetInputComponent();
 
 	// Return the first Actor within reach with physics body

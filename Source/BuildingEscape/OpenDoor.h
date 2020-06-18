@@ -22,24 +22,24 @@ public:
 
 	void OpenDoor(float DeltaTime);
 	void CloseDoor(float DeltaTime);
+	float GetTotalMassOfActors() const;
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
-
 
 private:
 	float InitialYaw;
 	float CurrentYaw;
 
 	UPROPERTY(EditAnywhere)
+	float MassToOpenDoor = 50.f;
+
+	UPROPERTY(EditAnywhere)
 	float TargetYaw = 90.f;
 
 	UPROPERTY(EditAnywhere)
-	ATriggerVolume* PressurePlate;
-
-	UPROPERTY(EditAnywhere)
-	AActor* ActorThatOpens;
+	ATriggerVolume* PressurePlate = nullptr;
 
 	float DoorLastOpened = 0.f;
 
